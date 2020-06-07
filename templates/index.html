@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <title>Acasa</title>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <a class="navbar-brand" href="#">GreenRomaniaInitiative</a>
+  <div class="collapse navbar-collapse" id="navbarColor01">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="{{ url_for('index') }}">Acasa</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('suppliers') }}">Furnizori</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('locations') }}">Locatii</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('customers') }}">Clienti</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<div class="jumbotron">
+  <h1 class="display-3">Buna ziua!</h1>
+  <p class="lead">GreenRomaniaInitiative isi propune promovarea masinilor electrice pe strazile tarii oferind infrastructura profesionala de alimentare.</p>
+  <hr class="my-4">
+  <p>Pentru accesarea majoritatii functionalitatii site-ului, te rugam sa te autentifici.</p>
+  <p class="lead">
+    <a class="btn btn-primary btn-lg" href="#" role="button">Autentificare</a>
+  </p>
+</div>
+</body>
+</html>
