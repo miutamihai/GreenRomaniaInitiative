@@ -7,23 +7,27 @@
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-  <a class="navbar-brand" href="#">GreenRomaniaInitiative</a>
-  <div class="collapse navbar-collapse" id="navbarColor01">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('index') }}">Acasa</a>
-      </li>
-      <li class="nav-item active">
-        <a class="nav-link" href="{{ url_for('suppliers') }}">Furnizori</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('locations') }}">Locatii</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('customers') }}">Clienti</a>
-      </li>
-    </ul>
-  </div>
+    <a class="navbar-brand" href="#">GreenRomaniaInitiative</a>
+    <div class="collapse navbar-collapse" id="navbarColor01">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('index') }}">Acasa</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{{ url_for('suppliers') }}">Furnizori</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('locations') }}">Locatii</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('customers') }}">Clienti</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('orders') }}">Comenzi</a>
+            </li>
+        </ul>
+    </div>
+    <a class="navbar-brand">Autentificat ca si {{ user_role }}</a>
 </nav>
 <h1 class="display-3">Acestia sunt furnizorii nostri</h1>
 <table class="table table-hover">
@@ -32,6 +36,9 @@
         <th scope="col">Nr</th>
         <th scope="col">Nume</th>
         <th scope="col">Pret per unitate</th>
+        {% if user_role == 'DbAdmin' %}
+            <th scope="col">Operatiuni</th>
+        {% endif %}
     </tr>
     </thead>
     <tbody>
@@ -40,6 +47,11 @@
             <td>{{ row[0] }}</td>
             <td>{{ row[1] }}</td>
             <td>{{ row[2] }}</td>
+            {% if user_role == 'DbAdmin' %}
+                <td>
+                    <a href="#">Sterge</a>
+                </td>
+            {% endif %}
         </tr>
     {% endfor %}
     </tbody>

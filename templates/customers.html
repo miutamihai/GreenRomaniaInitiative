@@ -22,8 +22,12 @@
             <li class="nav-item active">
                 <a class="nav-link" href="{{ url_for('customers') }}">Clienti</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('orders') }}">Comenzi</a>
+            </li>
         </ul>
     </div>
+    <a class="navbar-brand">Autentificat ca si {{ user_role }}</a>
 </nav>
 <h1 class="display-3">Acestia sunt clientii nostri</h1>
 <table class="table table-hover">
@@ -35,6 +39,9 @@
         <th scope="col">Oras</th>
         <th scope="col">Judet</th>
         <th scope="col">Tip client</th>
+        {% if user_role == 'DbAdmin' %}
+            <th scope="col">Operatiuni</th>
+        {% endif %}
     </tr>
     </thead>
     <tbody>
@@ -46,6 +53,11 @@
             <td>{{ row[3] }}</td>
             <td>{{ row[4] }}</td>
             <td>{{ row[5] }}</td>
+            {% if user_role == 'DbAdmin' %}
+                <td>
+                    <a href="#">Sterge</a>
+                </td>
+            {% endif %}
         </tr>
     {% endfor %}
     </tbody>

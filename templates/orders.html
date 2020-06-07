@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../static/css/bootstrap.css">
-    <title>Locatii</title>
+    <title>Comenzi</title>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -16,31 +16,36 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('suppliers') }}">Furnizori</a>
             </li>
-            <li class="nav-item active">
+            <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('locations') }}">Locatii</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('customers') }}">Clienti</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item active">
                 <a class="nav-link" href="{{ url_for('orders') }}">Comenzi</a>
             </li>
         </ul>
     </div>
     <a class="navbar-brand">Autentificat ca si {{ user_role }}</a>
 </nav>
-<h1 class="display-3">Acestea sunt locatiile noastre</h1>
+{% if data == '' %}
+<h1 class="display-3">Cauta istoricul de comenzi ale unui client</h1>
+<form class="form-inline my-2 my-lg-0" method="post">
+      <input class="form-control mr-sm-2" type="text" name="client" id="client" placeholder="Cauta...">
+      <button class="btn btn-secondary my-2 my-sm-0" type="submit">Cauta</button>
+    </form>
+{% else %}
+<h1 class="display-3">Acesta este istoricul de comenzi pentru clientul cu numarul {{ client }}</h1>
 <table class="table table-hover">
     <thead>
     <tr>
         <th scope="col">Nr</th>
-        <th scope="col">Adresa</th>
+        <th scope="col">Adresa incarcator</th>
         <th scope="col">Oras</th>
-        <th scope="col">Judet</th>
-        <th scope="col">Nume furnizor</th>
-        {% if user_role == 'DbAdmin' %}
-            <th scope="col">Operatiuni</th>
-        {% endif %}
+        <th scope="col">Unitati vandute</th>
+        <th scope="col">Data achizitie</th>
+        <th scope="col">Numar inmatriculare vehicul</th>
     </tr>
     </thead>
     <tbody>
@@ -51,14 +56,11 @@
             <td>{{ row[2] }}</td>
             <td>{{ row[3] }}</td>
             <td>{{ row[4] }}</td>
-            {% if user_role == 'DbAdmin' %}
-                <td>
-                    <a href="#">Sterge</a>
-                </td>
-            {% endif %}
+            <td>{{ row[5] }}</td>
         </tr>
     {% endfor %}
     </tbody>
 </table>
+{% endif %}
 </body>
 </html>

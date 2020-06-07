@@ -2,21 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Autentificare</title>
     <link rel="stylesheet" href="../static/css/bootstrap.css">
-    <title>Locatii</title>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <a class="navbar-brand" href="#">GreenRomaniaInitiative</a>
     <div class="collapse navbar-collapse" id="navbarColor01">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
+            <li class="nav-item active">
                 <a class="nav-link" href="{{ url_for('index') }}">Acasa</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('suppliers') }}">Furnizori</a>
             </li>
-            <li class="nav-item active">
+            <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('locations') }}">Locatii</a>
             </li>
             <li class="nav-item">
@@ -29,36 +29,24 @@
     </div>
     <a class="navbar-brand">Autentificat ca si {{ user_role }}</a>
 </nav>
-<h1 class="display-3">Acestea sunt locatiile noastre</h1>
-<table class="table table-hover">
-    <thead>
-    <tr>
-        <th scope="col">Nr</th>
-        <th scope="col">Adresa</th>
-        <th scope="col">Oras</th>
-        <th scope="col">Judet</th>
-        <th scope="col">Nume furnizor</th>
-        {% if user_role == 'DbAdmin' %}
-            <th scope="col">Operatiuni</th>
-        {% endif %}
-    </tr>
-    </thead>
-    <tbody>
-    {% for row in data %}
-        <tr class={{ "table-active" if row[0] % 2 == 0 }}>
-            <td>{{ row[0] }}</td>
-            <td>{{ row[1] }}</td>
-            <td>{{ row[2] }}</td>
-            <td>{{ row[3] }}</td>
-            <td>{{ row[4] }}</td>
-            {% if user_role == 'DbAdmin' %}
-                <td>
-                    <a href="#">Sterge</a>
-                </td>
-            {% endif %}
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<div class="jumbotron">
+    <form method="post" action="{{ url_for('login') }}">
+        <fieldset>
+            <h1 class="display-3">Autentificare</h1>
+            <div class="form-group">
+                <label for="username">Nume de utilizator</label>
+                <input type="text" class="form-control" id="username" name="username" aria-describedby="usernameHelp"
+                       placeholder="Introdu-ti numele de utilizator">
+                <small id="usernameHelp" class="form-text text-muted">In caz ca ai uitat, este de forma <b>prenume +
+                    initiala numelui</b></small>
+            </div>
+            <div class="form-group">
+                <label for="password">Parola</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Parola">
+            </div>
+            <button type="submit" class="btn btn-primary">Trimite</button>
+        </fieldset>
+    </form>
+</div>
 </body>
 </html>

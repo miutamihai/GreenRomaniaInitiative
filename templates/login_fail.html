@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../static/css/bootstrap.css">
-    <title>Acasa</title>
+    <title>Eroare</title>
 </head>
+<body>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <a class="navbar-brand" href="#">GreenRomaniaInitiative</a>
@@ -27,23 +28,11 @@
             </li>
         </ul>
     </div>
-    <a class="navbar-brand">Autentificat ca si {{ user_role }}</a>
 </nav>
 <div class="jumbotron">
-    <h1 class="display-3">Buna ziua!</h1>
-    <p class="lead">GreenRomaniaInitiative isi propune promovarea masinilor electrice pe strazile tarii oferind
-        infrastructura profesionala de alimentare.</p>
-    <hr class="my-4">
-    {% if user_role == 'Client' %}
-        <p>Pentru accesarea majoritatii functionalitatii site-ului, te rugam sa te autentifici.</p>
-        <p class="lead">
-            <a class="btn btn-primary btn-lg" href="{{ url_for('login') }}" role="button">Autentificare</a>
-        </p>
-    {% else %}
-        <p class="lead">
-            <a class="btn btn-primary btn-lg" href="{{ url_for('logout') }}" role="button">Iesi din cont</a>
-        </p>
-    {% endif %}
+    <h1 class="display-3">Eroare</h1>
+    <p class="lead">Nume de utilizator sau parola gresite.</p>
 </div>
+</body>
 </body>
 </html>
