@@ -27,7 +27,7 @@
             </li>
         </ul>
     </div>
-    <a class="navbar-brand">Autentificat ca si {{ user_role }}</a>
+    <a class="navbar-brand">Autentificat ca si {{ user_data['Role'] }}</a>
 </nav>
 <div class="jumbotron">
     <form method="post" action="{{ url_for('login') }}">

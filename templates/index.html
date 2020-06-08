@@ -27,14 +27,14 @@
             </li>
         </ul>
     </div>
-    <a class="navbar-brand">Autentificat ca si {{ user_role }}</a>
+    <a class="navbar-brand">Autentificat ca si {{ user_data['Role'] }}</a>
 </nav>
 <div class="jumbotron">
     <h1 class="display-3">Buna ziua!</h1>
     <p class="lead">GreenRomaniaInitiative isi propune promovarea masinilor electrice pe strazile tarii oferind
         infrastructura profesionala de alimentare.</p>
     <hr class="my-4">
-    {% if user_role == 'Client' %}
+    {% if user_data['Role'] == 'Client' %}
         <p>Pentru accesarea majoritatii functionalitatii site-ului, te rugam sa te autentifici.</p>
         <p class="lead">
             <a class="btn btn-primary btn-lg" href="{{ url_for('login') }}" role="button">Autentificare</a>
