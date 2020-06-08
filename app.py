@@ -80,11 +80,24 @@ def locations():
         return render_template('locations.html', data=cursor, user_data=user_data)
 
 
-@app.route('/furnizori')
+@app.route('/furnizori', methods=['GET', 'POST'])
 def suppliers():
-    cursor = conn.cursor()
-    cursor.execute('select * from MIHAI.ELECTRICITYTBL')
-    return render_template('suppliers.html', data=cursor, user_data=user_data)
+    if request.method == 'GET':
+        cursor = conn.cursor()
+        cursor.execute('select * from MIHAI.ELECTRICITYTBL')
+        return render_template('suppliers.html', data=cursor, user_data=user_data)
+    else:
+        cursor = conn.cursor()
+        cursor.execute('''select num_rows from all_tables where table_name = 'ELECTRICITYTBL' ''')
+        provider_id = int(cursor.fetchone()[0]) + 1
+        provider_name = request.form['newProviderName']
+        provider_price_per_unit = int(request.form['newProviderPricePerUnit'])
+        cursor.execute(
+            'insert into ELECTRICITYTBL(ELECTRICITYID, PRODUCERNAME, PRICEPERUNIT) VALUES (:id, :name, :price)',
+            id=provider_id, name=provider_name, price=provider_price_per_unit)
+        conn.commit()
+        cursor.execute('select * from MIHAI.ELECTRICITYTBL')
+        return render_template('suppliers.html', data=cursor, user_data=user_data)
 
 
 @app.route('/autentificare', methods=['GET', 'POST'])
@@ -157,6 +170,16 @@ def delete_location(location_id):
             inner join ELECTRICITYTBL E on CHARGERTBL.ELECTRICITYID = E.ELECTRICITYID
             order by CHARGERID''')
     return render_template('locations.html', data=cursor, user_data=user_data)
+
+
+@app.route('/sterge_furnizor/<string:provider_id>')
+def delete_provider(provider_id):
+    provider_id = int(provider_id)
+    cursor = conn.cursor()
+    cursor.execute('delete from ELECTRICITYTBL where ELECTRICITYID = :providerId', providerId=provider_id)
+    conn.commit()
+    cursor.execute('select * from MIHAI.ELECTRICITYTBL')
+    return render_template('suppliers.html', data=cursor, user_data=user_data)
 
 
 if __name__ == '__main__':

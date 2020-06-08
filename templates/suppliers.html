@@ -8,24 +8,53 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 <body>
-<div class="modal" id="delete" tabindex="-1" role="dialog" aria-labelledby="label" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="label">Stergere furnizor</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        Confirma stergerea furnizorului din baza de date.
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Anulare</button>
-        <button type="button" class="btn btn-primary">Confirm</button>
-      </div>
+<input type="hidden" id="providerId">
+<div class="modal" id="insert" tabindex="-1" role="dialog" aria-labelledby="label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="label">Creeaza un nou furnizor</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="lead">Introdu datele furnizorului</p>
+                <form class="form-inline my-2 my-lg-0" method="post">
+                    <fieldset>
+                        <input class="form-control mr-sm-2" type="text" name="newProviderName" id="newProviderName"
+                               placeholder="Nume furnizor">
+                        <input class="form-control mr-sm-2" type="text" name="newProviderPricePerUnit"
+                               id="newProviderPricePerUnit"
+                               placeholder="Pret per unitate">
+                        <button type="submit" class="btn btn-primary">Trimite</button>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Anulare</button>
+            </div>
+        </div>
     </div>
-  </div>
+</div>
+<div class="modal" id="delete" tabindex="-1" role="dialog" aria-labelledby="label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="label">Stergere furnizor</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Confirma stergerea furnizorului din baza de date.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Anulare</button>
+                <button type="button" class="btn btn-primary" onclick="deleteProvider()">Confirm</button>
+            </div>
+        </div>
+    </div>
 </div>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <a class="navbar-brand" href="#">GreenRomaniaInitiative</a>
@@ -48,7 +77,13 @@
             </li>
         </ul>
     </div>
-    <a class="navbar-brand">Autentificat ca si {{ user_data['Role'] }}</a>
+    {% if user_data['Role'] == 'Client' %}
+        <a class="navbar-brand">Autentificat ca si {{ user_data['Role'] }}</a>
+    {% else %}
+        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#insert">
+            Creeaza un nou furnizor
+        </button>
+    {% endif %}
 </nav>
 <h1 class="display-3">Acestia sunt furnizorii nostri</h1>
 <table class="table table-hover">
@@ -70,7 +105,8 @@
             <td>{{ row[2] }}</td>
             {% if user_data['Role'] == 'DbAdmin' %}
                 <td>
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete">
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete"
+                            onclick="setProviderId({{ row[0] }})">
                         Sterge
                     </button>
                 </td>
@@ -79,5 +115,14 @@
     {% endfor %}
     </tbody>
 </table>
+<script>
+    function setProviderId(provider) {
+        document.getElementById('providerId').innerText = provider;
+    }
+
+    function deleteProvider() {
+        document.location.href = '/sterge_furnizor/' + encodeURIComponent(document.getElementById('providerId').innerText);
+    }
+</script>
 </body>
 </html>
