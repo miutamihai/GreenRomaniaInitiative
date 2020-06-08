@@ -35,6 +35,8 @@
       <input class="form-control mr-sm-2" type="text" name="client" id="client" placeholder="Cauta...">
       <button class="btn btn-secondary my-2 my-sm-0" type="submit">Cauta</button>
     </form>
+{% elif data == None %}
+    <h1 class="display-3">Clientul nu a efectuat nicio comanda</h1>
 {% else %}
 <h1 class="display-3">Acesta este istoricul de comenzi pentru clientul cu numarul {{ client }}</h1>
 <table class="table table-hover">

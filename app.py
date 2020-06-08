@@ -85,7 +85,8 @@ def orders():
             inner join CHARGERTBL C2 on CHARGINGDETAILSTBL.CHARGERID = C2.CHARGERID
             inner join VEHICLETBL V on CHARGINGDETAILSTBL.VEHICLEID = V.VEHICLEID
             where CUSTOMERID = :clientId''', clientId=client)
-        print(cursor.fetchone())
+        if cursor.fetchone() is None:
+            cursor = None
         return render_template('orders.html', user_data=user_data, data=cursor, client=client)
 
 
