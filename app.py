@@ -92,17 +92,26 @@ def login():
 def orders():
     if request.method == 'GET':
         return render_template('orders.html', user_data=user_data, data='')
-    else:
+    elif 'client' in request.form:
         client = int(request.form['client'])
         cursor = conn.cursor()
         cursor.execute('''select TRANSACTIONID, CHARGERADDRESS, CHARGERCITY, UNITSSOLD, SALEDATE, VEHICLEREGNO from
-            CHARGINGDETAILSTBL
-            inner join CHARGERTBL C2 on CHARGINGDETAILSTBL.CHARGERID = C2.CHARGERID
-            inner join VEHICLETBL V on CHARGINGDETAILSTBL.VEHICLEID = V.VEHICLEID
-            where CUSTOMERID = :clientId''', clientId=client)
-        if cursor.fetchone() is None:
-            cursor = None
-        return render_template('orders.html', user_data=user_data, data=cursor, client=client)
+                    CHARGINGDETAILSTBL
+                    inner join CHARGERTBL C2 on CHARGINGDETAILSTBL.CHARGERID = C2.CHARGERID
+                    inner join VEHICLETBL V on CHARGINGDETAILSTBL.VEHICLEID = V.VEHICLEID
+                    where CUSTOMERID = :clientId''', clientId=client)
+        res = cursor.fetchall()
+        if not res:
+            res = None
+        return render_template('orders.html', user_data=user_data, data=res, client=client)
+    else:
+        station_id = int(request.form['stationId'])
+        units = int(request.form['units'])
+        reg_no = request.form['regNo']
+        cursor = conn.cursor()
+        cursor.callproc('InsertOrder', parameters=[station_id, units, reg_no, user_data['Name'], user_data['Password']])
+        conn.commit()
+        return render_template('order_success.html')
 
 
 @app.route('/sterge_client/<string:client_id>')
