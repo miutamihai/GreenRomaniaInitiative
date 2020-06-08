@@ -4,8 +4,29 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../static/css/bootstrap.css">
     <title>Furnizori</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 <body>
+<div class="modal" id="delete" tabindex="-1" role="dialog" aria-labelledby="label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="label">Stergere client</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Confirma stergerea furnizorului din baza de date.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Anulare</button>
+        <button type="button" class="btn btn-primary">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <a class="navbar-brand" href="#">GreenRomaniaInitiative</a>
     <div class="collapse navbar-collapse" id="navbarColor01">
@@ -49,7 +70,9 @@
             <td>{{ row[2] }}</td>
             {% if user_data['Role'] == 'DbAdmin' %}
                 <td>
-                    <a href="#">Sterge</a>
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete">
+                        Sterge
+                    </button>
                 </td>
             {% endif %}
         </tr>
