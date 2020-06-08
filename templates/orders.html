@@ -4,8 +4,37 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../static/css/bootstrap.css">
     <title>Comenzi</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 <body>
+<div class="modal" id="insert" tabindex="-1" role="dialog" aria-labelledby="label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="label">Introducere comanda</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="lead">Introdu datele comenzii</p>
+                <form class="form-inline my-2 my-lg-0" method="post">
+                    <input class="form-control mr-sm-2" type="text" name="stationId" id="stationId"
+                           placeholder="ID locatie">
+                    <input class="form-control mr-sm-2" type="text" name="units" id="units"
+                           placeholder="Nr unitati achizitionate">
+                    <input class="form-control mr-sm-2" type="text" name="regNo" id="regNo"
+                           placeholder="Nr inregistrare vehicul">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Anulare</button>
+                <button type="button" class="btn btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <a class="navbar-brand" href="#">GreenRomaniaInitiative</a>
     <div class="collapse navbar-collapse" id="navbarColor01">
@@ -27,42 +56,48 @@
             </li>
         </ul>
     </div>
+    {% if user_data['Role'] == 'Client' %}
     <a class="navbar-brand">Autentificat ca si {{ user_data['Role'] }}</a>
+    {% else %}
+    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#insert">
+        Introdu o noua comanda
+    </button>
+    {% endif %}
 </nav>
 {% if data == '' %}
-<h1 class="display-3">Cauta istoricul de comenzi ale unui client</h1>
-<form class="form-inline my-2 my-lg-0" method="post">
-      <input class="form-control mr-sm-2" type="text" name="client" id="client" placeholder="Cauta...">
-      <button class="btn btn-secondary my-2 my-sm-0" type="submit">Cauta</button>
+    <h1 class="display-3">Cauta istoricul de comenzi ale unui client</h1>
+    <form class="form-inline my-2 my-lg-0" method="post">
+        <input class="form-control mr-sm-2" type="text" name="client" id="client" placeholder="Cauta...">
+        <button class="btn btn-secondary my-2 my-sm-0" type="submit">Cauta</button>
     </form>
 {% elif data == None %}
     <h1 class="display-3">Clientul nu a efectuat nicio comanda</h1>
 {% else %}
-<h1 class="display-3">Acesta este istoricul de comenzi pentru clientul cu numarul {{ client }}</h1>
-<table class="table table-hover">
-    <thead>
-    <tr>
-        <th scope="col">Nr</th>
-        <th scope="col">Adresa incarcator</th>
-        <th scope="col">Oras</th>
-        <th scope="col">Unitati vandute</th>
-        <th scope="col">Data achizitie</th>
-        <th scope="col">Numar inmatriculare vehicul</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for row in data %}
-        <tr class={{ "table-active" if row[0] % 2 == 0 }}>
-            <td>{{ row[0] }}</td>
-            <td>{{ row[1] }}</td>
-            <td>{{ row[2] }}</td>
-            <td>{{ row[3] }}</td>
-            <td>{{ row[4] }}</td>
-            <td>{{ row[5] }}</td>
+    <h1 class="display-3">Acesta este istoricul de comenzi pentru clientul cu numarul {{ client }}</h1>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col">Nr</th>
+            <th scope="col">Adresa incarcator</th>
+            <th scope="col">Oras</th>
+            <th scope="col">Unitati vandute</th>
+            <th scope="col">Data achizitie</th>
+            <th scope="col">Numar inmatriculare vehicul</th>
         </tr>
-    {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        {% for row in data %}
+            <tr class={{ "table-active" if row[0] % 2 == 0 }}>
+                <td>{{ row[0] }}</td>
+                <td>{{ row[1] }}</td>
+                <td>{{ row[2] }}</td>
+                <td>{{ row[3] }}</td>
+                <td>{{ row[4] }}</td>
+                <td>{{ row[5] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endif %}
 </body>
 </html>
