@@ -42,21 +42,42 @@ def customers():
         client_city = request.form['newClientCity']
         client_county = request.form['newClientCounty']
         client_no_of_employees = int(request.form['newClientNoOfEmployees'])
-        cursor.callproc('CreateCustomer', parameters=[client_id, client_name, client_address, client_city, client_county, client_no_of_employees, user_data['Name'], user_data['Password']])
+        cursor.callproc('CreateCustomer',
+                        parameters=[client_id, client_name, client_address, client_city, client_county,
+                                    client_no_of_employees, user_data['Name'], user_data['Password']])
         conn.commit()
         cursor.execute('''select CUSTOMERID, CUSTOMERNAME, CUSTOMERADDRESS, CUSTOMERCITY, CUSTOMERCOUNTY, CUSTOMERTYPE
                     from CUSTOMERTBL''')
         return render_template('customers.html', user_data=user_data, data=cursor)
 
 
-@app.route('/locatii')
+@app.route('/locatii', methods=['GET', 'POST'])
 def locations():
-    cursor = conn.cursor()
-    cursor.execute('''select chargerid, chargeraddress, chargercity, chargercounty, producername
-        from CHARGERTBL
-        inner join ELECTRICITYTBL E on CHARGERTBL.ELECTRICITYID = E.ELECTRICITYID
-        order by CHARGERID''')
-    return render_template('locations.html', data=cursor, user_data=user_data)
+    if request.method == 'GET':
+        cursor = conn.cursor()
+        cursor.execute('''select chargerid, chargeraddress, chargercity, chargercounty, producername
+                from CHARGERTBL
+                inner join ELECTRICITYTBL E on CHARGERTBL.ELECTRICITYID = E.ELECTRICITYID
+                order by CHARGERID''')
+        return render_template('locations.html', data=cursor, user_data=user_data)
+    else:
+        cursor = conn.cursor()
+        cursor.execute('''select num_rows from all_tables where table_name = 'CHARGERTBL' ''')
+        location_id = int(cursor.fetchone()[0]) + 1
+        location_address = request.form['newLocationAddress']
+        location_city = request.form['newLocationCity']
+        location_county = request.form['newLocationCounty']
+        location_provider_id = int(request.form['newLocationProviderId'])
+        cursor.execute(
+            'insert into CHARGERTBL(chargerid, chargeraddress, chargercity, chargercounty, electricityid) values (:id, :address, :city, :county, :provider)',
+            id=location_id, address=location_address, city=location_city, county=location_county,
+            provider=location_provider_id)
+        conn.commit()
+        cursor.execute('''select chargerid, chargeraddress, chargercity, chargercounty, producername
+                        from CHARGERTBL
+                        inner join ELECTRICITYTBL E on CHARGERTBL.ELECTRICITYID = E.ELECTRICITYID
+                        order by CHARGERID''')
+        return render_template('locations.html', data=cursor, user_data=user_data)
 
 
 @app.route('/furnizori')
@@ -123,6 +144,19 @@ def delete_client(client_id):
     cursor.execute('''select CUSTOMERID, CUSTOMERNAME, CUSTOMERADDRESS, CUSTOMERCITY, CUSTOMERCOUNTY, CUSTOMERTYPE
             from CUSTOMERTBL''')
     return render_template('customers.html', user_data=user_data, data=cursor)
+
+
+@app.route('/sterge_locatie/<string:location_id>')
+def delete_location(location_id):
+    location_id = int(location_id)
+    cursor = conn.cursor()
+    cursor.execute('delete from CHARGERTBL where CHARGERID = :locationId', locationId=location_id)
+    conn.commit()
+    cursor.execute('''select chargerid, chargeraddress, chargercity, chargercounty, producername
+            from CHARGERTBL
+            inner join ELECTRICITYTBL E on CHARGERTBL.ELECTRICITYID = E.ELECTRICITYID
+            order by CHARGERID''')
+    return render_template('locations.html', data=cursor, user_data=user_data)
 
 
 if __name__ == '__main__':

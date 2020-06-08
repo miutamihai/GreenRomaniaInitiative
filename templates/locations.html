@@ -8,6 +8,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 <body>
+<input type="hidden" id="locationId">
 <div class="modal" id="delete" tabindex="-1" role="dialog" aria-labelledby="label" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -22,10 +23,42 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Anulare</button>
-        <button type="button" class="btn btn-primary">Confirm</button>
+        <button type="button" class="btn btn-primary" onclick="deleteLocation()">Confirm</button>
       </div>
     </div>
   </div>
+</div>
+<div class="modal" id="insert" tabindex="-1" role="dialog" aria-labelledby="label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="label">Creeaza o noua locatie</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="lead">Introdu datele locatiei</p>
+                <form class="form-inline my-2 my-lg-0" method="post">
+                    <fieldset>
+                        <input class="form-control mr-sm-2" type="text" name="newLocationAddress" id="newLocationAddress"
+                               placeholder="Adresa locatiei">
+                        <input class="form-control mr-sm-2" type="text" name="newLocationCity" id="newLocationCity"
+                               placeholder="Oras locatiei">
+                        <input class="form-control mr-sm-2" type="text" name="newLocationCounty" id="newLocationCounty"
+                               placeholder="Judet locatie">
+                        <input class="form-control mr-sm-2" type="text" name="newLocationProviderId"
+                               id="newLocationProviderId"
+                               placeholder="Id furnizor">
+                        <button type="submit" class="btn btn-primary">Trimite</button>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Anulare</button>
+            </div>
+        </div>
+    </div>
 </div>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <a class="navbar-brand" href="#">GreenRomaniaInitiative</a>
@@ -48,7 +81,13 @@
             </li>
         </ul>
     </div>
-    <a class="navbar-brand">Autentificat ca si {{ user_data['Role'] }}</a>
+    {% if user_data['Role'] == 'Client' %}
+        <a class="navbar-brand">Autentificat ca si {{ user_data['Role'] }}</a>
+    {% else %}
+        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#insert">
+            Creeaza o noua locatie
+        </button>
+    {% endif %}
 </nav>
 <h1 class="display-3">Acestea sunt locatiile noastre</h1>
 <table class="table table-hover">
@@ -74,7 +113,8 @@
             <td>{{ row[4] }}</td>
             {% if user_data['Role'] == 'DbAdmin' %}
                 <td>
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete">
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete"
+                    onclick="setLocationId({{ row[0] }})">
                         Sterge
                     </button>
                 </td>
@@ -83,5 +123,14 @@
     {% endfor %}
     </tbody>
 </table>
+<script>
+    function setLocationId(location) {
+        document.getElementById('locationId').innerText = location;
+    }
+
+    function deleteLocation() {
+        document.location.href = '/sterge_locatie/' + encodeURIComponent(document.getElementById('locationId').innerText);
+    }
+</script>
 </body>
 </html>
