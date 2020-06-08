@@ -90,5 +90,16 @@ def orders():
         return render_template('orders.html', user_data=user_data, data=cursor, client=client)
 
 
+@app.route('/sterge_client/<string:client_id>')
+def delete_client(client_id):
+    client_id = int(client_id)
+    cursor = conn.cursor()
+    cursor.callproc('DeleteCustomer', parameters=[client_id, user_data['Name'], user_data['Password']])
+    conn.commit()
+    cursor.execute('''select CUSTOMERID, CUSTOMERNAME, CUSTOMERADDRESS, CUSTOMERCITY, CUSTOMERCOUNTY, CUSTOMERTYPE
+            from CUSTOMERTBL''')
+    return render_template('customers.html', user_data=user_data, data=cursor)
+
+
 if __name__ == '__main__':
     app.run()
