@@ -26,12 +26,27 @@ def logout():
     return render_template('index.html', user_data=user_data)
 
 
-@app.route('/clienti')
+@app.route('/clienti', methods=['GET', 'POST'])
 def customers():
-    cursor = conn.cursor()
-    cursor.execute('''select CUSTOMERID, CUSTOMERNAME, CUSTOMERADDRESS, CUSTOMERCITY, CUSTOMERCOUNTY, CUSTOMERTYPE
-        from CUSTOMERTBL''')
-    return render_template('customers.html', data=cursor, user_data=user_data)
+    if request.method == 'GET':
+        cursor = conn.cursor()
+        cursor.execute('''select CUSTOMERID, CUSTOMERNAME, CUSTOMERADDRESS, CUSTOMERCITY, CUSTOMERCOUNTY, CUSTOMERTYPE
+                from CUSTOMERTBL''')
+        return render_template('customers.html', data=cursor, user_data=user_data)
+    else:
+        cursor = conn.cursor()
+        cursor.execute('''select num_rows from all_tables where table_name = 'CUSTOMERTBL' ''')
+        client_id = int(cursor.fetchone()[0]) + 1
+        client_name = request.form['newClientName']
+        client_address = request.form['newClientAddress']
+        client_city = request.form['newClientCity']
+        client_county = request.form['newClientCounty']
+        client_no_of_employees = int(request.form['newClientNoOfEmployees'])
+        cursor.callproc('CreateCustomer', parameters=[client_id, client_name, client_address, client_city, client_county, client_no_of_employees, user_data['Name'], user_data['Password']])
+        conn.commit()
+        cursor.execute('''select CUSTOMERID, CUSTOMERNAME, CUSTOMERADDRESS, CUSTOMERCITY, CUSTOMERCOUNTY, CUSTOMERTYPE
+                    from CUSTOMERTBL''')
+        return render_template('customers.html', user_data=user_data, data=cursor)
 
 
 @app.route('/locatii')
