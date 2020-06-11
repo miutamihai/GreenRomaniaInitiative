@@ -1,4 +1,4 @@
-import cx_Oracle
+import pyodbc
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
@@ -9,8 +9,12 @@ user_data = {
     'Role': 'Client'
 }
 
-dsn_tns = cx_Oracle.makedsn('localhost', '1521', service_name='ORCLCDB.localdomain')
-conn = cx_Oracle.connect(user='mihai', password='mihai16', dsn=dsn_tns)
+conn = pyodbc.connect(
+    "Driver={SQL Server Native Client 11.0};"
+    "Server=;"  # aici pui numele laptopului tau 
+    "Database=GreenRomaniaInitiative;"
+    "Trusted_Connection=yes;"
+)
 
 
 @app.route('/')
@@ -31,23 +35,21 @@ def customers():
     if request.method == 'GET':
         cursor = conn.cursor()
         cursor.execute('''select CUSTOMERID, CUSTOMERNAME, CUSTOMERADDRESS, CUSTOMERCITY, CUSTOMERCOUNTY, CUSTOMERTYPE
-                from CUSTOMERTBL''')
+                from dbo.CUSTOMERTBL''')
         return render_template('customers.html', data=cursor, user_data=user_data)
     else:
         cursor = conn.cursor()
-        cursor.execute('''select num_rows from all_tables where table_name = 'CUSTOMERTBL' ''')
-        client_id = int(cursor.fetchone()[0]) + 1
         client_name = request.form['newClientName']
         client_address = request.form['newClientAddress']
         client_city = request.form['newClientCity']
         client_county = request.form['newClientCounty']
         client_no_of_employees = int(request.form['newClientNoOfEmployees'])
-        cursor.callproc('CreateCustomer',
-                        parameters=[client_id, client_name, client_address, client_city, client_county,
-                                    client_no_of_employees, user_data['Name'], user_data['Password']])
+        cursor.execute('exec CreateCustomer ?, ?, ?, ?, ?, ?', (
+            client_name, client_address, client_city, client_county, client_no_of_employees, user_data['Name'],
+            user_data['Password']))
         conn.commit()
         cursor.execute('''select CUSTOMERID, CUSTOMERNAME, CUSTOMERADDRESS, CUSTOMERCITY, CUSTOMERCOUNTY, CUSTOMERTYPE
-                    from CUSTOMERTBL''')
+                    from dbo.CUSTOMERTBL''')
         return render_template('customers.html', user_data=user_data, data=cursor)
 
 
@@ -56,25 +58,22 @@ def locations():
     if request.method == 'GET':
         cursor = conn.cursor()
         cursor.execute('''select chargerid, chargeraddress, chargercity, chargercounty, producername
-                from CHARGERTBL
+                from dbo.CHARGERTBL
                 inner join ELECTRICITYTBL E on CHARGERTBL.ELECTRICITYID = E.ELECTRICITYID
                 order by CHARGERID''')
         return render_template('locations.html', data=cursor, user_data=user_data)
     else:
         cursor = conn.cursor()
-        cursor.execute('''select num_rows from all_tables where table_name = 'CHARGERTBL' ''')
-        location_id = int(cursor.fetchone()[0]) + 1
         location_address = request.form['newLocationAddress']
         location_city = request.form['newLocationCity']
         location_county = request.form['newLocationCounty']
         location_provider_id = int(request.form['newLocationProviderId'])
         cursor.execute(
-            'insert into CHARGERTBL(chargerid, chargeraddress, chargercity, chargercounty, electricityid) values (:id, :address, :city, :county, :provider)',
-            id=location_id, address=location_address, city=location_city, county=location_county,
-            provider=location_provider_id)
+            'insert into dbo.CHARGERTBL(chargerid, chargeraddress, chargercity, chargercounty, electricityid) values (?, ?, ?, ?, ?)',
+            (location_address, location_city, location_county, location_provider_id))
         conn.commit()
         cursor.execute('''select chargerid, chargeraddress, chargercity, chargercounty, producername
-                        from CHARGERTBL
+                        from dbo.CHARGERTBL
                         inner join ELECTRICITYTBL E on CHARGERTBL.ELECTRICITYID = E.ELECTRICITYID
                         order by CHARGERID''')
         return render_template('locations.html', data=cursor, user_data=user_data)
@@ -84,19 +83,17 @@ def locations():
 def suppliers():
     if request.method == 'GET':
         cursor = conn.cursor()
-        cursor.execute('select * from MIHAI.ELECTRICITYTBL')
+        cursor.execute('select * from dbo.ELECTRICITYTBL')
         return render_template('suppliers.html', data=cursor, user_data=user_data)
     else:
         cursor = conn.cursor()
-        cursor.execute('''select num_rows from all_tables where table_name = 'ELECTRICITYTBL' ''')
-        provider_id = int(cursor.fetchone()[0]) + 1
         provider_name = request.form['newProviderName']
         provider_price_per_unit = int(request.form['newProviderPricePerUnit'])
         cursor.execute(
-            'insert into ELECTRICITYTBL(ELECTRICITYID, PRODUCERNAME, PRICEPERUNIT) VALUES (:id, :name, :price)',
-            id=provider_id, name=provider_name, price=provider_price_per_unit)
+            'insert into dbo.ELECTRICITYTBL(ELECTRICITYID, PRODUCERNAME, PRICEPERUNIT) VALUES (?, ?, ?)',
+            (provider_name, provider_price_per_unit))
         conn.commit()
-        cursor.execute('select * from MIHAI.ELECTRICITYTBL')
+        cursor.execute('select * from dbo.ELECTRICITYTBL')
         return render_template('suppliers.html', data=cursor, user_data=user_data)
 
 
@@ -109,9 +106,9 @@ def login():
         cursor = conn.cursor()
         username = request.form['username']
         password = request.form['password']
-        cursor.execute('''select ROLENAME from USERROLES
+        cursor.execute('''select ROLENAME from dbo.USERROLES
             inner join USERS U on USERROLES.ROLEID = U.USERROLEID
-            where USERNAME= :userName and USERPASSWORD=:userPassword''', userName=username, userPassword=password)
+            where USERNAME= ? and USERPASSWORD=?''', (username, password))
         res = cursor.fetchone()
         if res is None:
             return render_template('login_fail.html')
@@ -130,10 +127,10 @@ def orders():
         client = int(request.form['client'])
         cursor = conn.cursor()
         cursor.execute('''select TRANSACTIONID, CHARGERADDRESS, CHARGERCITY, UNITSSOLD, SALEDATE, VEHICLEREGNO from
-                    CHARGINGDETAILSTBL
+                    dbo.CHARGINGDETAILSTBL
                     inner join CHARGERTBL C2 on CHARGINGDETAILSTBL.CHARGERID = C2.CHARGERID
                     inner join VEHICLETBL V on CHARGINGDETAILSTBL.VEHICLEID = V.VEHICLEID
-                    where CUSTOMERID = :clientId''', clientId=client)
+                    where CUSTOMERID = ?''', client)
         res = cursor.fetchall()
         if not res:
             res = None
@@ -143,7 +140,7 @@ def orders():
         units = int(request.form['units'])
         reg_no = request.form['regNo']
         cursor = conn.cursor()
-        cursor.callproc('InsertOrder', parameters=[station_id, units, reg_no, user_data['Name'], user_data['Password']])
+        cursor.execute('exec InsertOrder ?, ?, ?, ?, ?', (station_id, units, reg_no, user_data['Name'], user_data['Password']))
         conn.commit()
         return render_template('order_success.html')
 
@@ -152,10 +149,10 @@ def orders():
 def delete_client(client_id):
     client_id = int(client_id)
     cursor = conn.cursor()
-    cursor.callproc('DeleteCustomer', parameters=[client_id, user_data['Name'], user_data['Password']])
+    cursor.execute('exec DeleteCustomer ?, ?, ?', (client_id, user_data['Name'], user_data['Password']))
     conn.commit()
     cursor.execute('''select CUSTOMERID, CUSTOMERNAME, CUSTOMERADDRESS, CUSTOMERCITY, CUSTOMERCOUNTY, CUSTOMERTYPE
-            from CUSTOMERTBL''')
+            from dbo.CUSTOMERTBL''')
     return render_template('customers.html', user_data=user_data, data=cursor)
 
 
@@ -163,10 +160,10 @@ def delete_client(client_id):
 def delete_location(location_id):
     location_id = int(location_id)
     cursor = conn.cursor()
-    cursor.execute('delete from CHARGERTBL where CHARGERID = :locationId', locationId=location_id)
+    cursor.execute('delete from dbo.CHARGERTBL where CHARGERID = ?', location_id)
     conn.commit()
     cursor.execute('''select chargerid, chargeraddress, chargercity, chargercounty, producername
-            from CHARGERTBL
+            from dbo.CHARGERTBL
             inner join ELECTRICITYTBL E on CHARGERTBL.ELECTRICITYID = E.ELECTRICITYID
             order by CHARGERID''')
     return render_template('locations.html', data=cursor, user_data=user_data)
@@ -176,9 +173,9 @@ def delete_location(location_id):
 def delete_provider(provider_id):
     provider_id = int(provider_id)
     cursor = conn.cursor()
-    cursor.execute('delete from ELECTRICITYTBL where ELECTRICITYID = :providerId', providerId=provider_id)
+    cursor.execute('delete from dbo.ELECTRICITYTBL where ELECTRICITYID = ?', provider_id)
     conn.commit()
-    cursor.execute('select * from MIHAI.ELECTRICITYTBL')
+    cursor.execute('select * from dbo.ELECTRICITYTBL')
     return render_template('suppliers.html', data=cursor, user_data=user_data)
 
 
